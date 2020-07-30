@@ -353,7 +353,7 @@ static void kv_serv_hello (void)
 
 /* start KidVPN server */
 int kv_serv_start (int vnd_id, const char *tap_name, const unsigned char *key, unsigned int keybits,
-                   const char *local, unsigned int port, int mtu)
+                   const char *local, unsigned int port, int mtu, int is_tcp)
 {
     pthread_t t_hello;
 
@@ -398,7 +398,7 @@ int kv_serv_start (int vnd_id, const char *tap_name, const unsigned char *key, u
     }
 
     vnd_mtu = mtu;
-    if (kv_lib_init(vnd_id, tap_name, &serv_fd, &vnd_fd, serv_hwaddr, mtu)) { /* init server */
+    if (kv_lib_init(vnd_id, tap_name, &serv_fd, &vnd_fd, serv_hwaddr, mtu, is_tcp)) { /* init server */
         return  (-1);
     }
 

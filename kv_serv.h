@@ -179,7 +179,7 @@ struct kv_err_hdr {
 
 /* KidVPN server start */
 int kv_serv_start(int vnd_id, const char *tap_name, const unsigned char *key, unsigned int keybits,
-                  const char *local, unsigned int port, int mtu);
+                  const char *local, unsigned int port, int mtu, int is_tcp);
 
 #ifdef __cplusplus
 }

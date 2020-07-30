@@ -127,12 +127,13 @@ int main (int argc, char *argv[])
 {
     FILE *fkey;
     int hole_punching;
-    int i, vnd_id, rand_fd, is_serv, mtu = KV_VND_DEF_MTU;
+    int i, vnd_id, rand_fd, is_serv, is_tcp, mtu = KV_VND_DEF_MTU;
     unsigned int port;
     void *cfg;
     const char *keyfile;
     const char *ipaddr;
     const char *mode;
+    const char *proto;
     char *straddr;
     char keyascii[65];
     unsigned char keycode[32];
@@ -149,6 +150,7 @@ usage:
                "       config file like this:\n"
                "           [server_0]\n"
                "           mode=server                   # Run as server mode\n"
+               "           protocol=udp                  # VPN Protocol (udp or tcp)\n"
                "           key_file=serv.key             # AES key file\n"
                "           vnd_id=0                      # Virtual network device ID (For SylixOS)\n"
                "           tap_name=tap0                 # Virtual network device name (For Linux & Windows)\n"
@@ -157,6 +159,7 @@ usage:
                "           port=10088                    # Local port (Optional default: 10088)\n\n"
                "           [client_0]\n"
                "           mode=client                   # Run as client mode\n"
+               "           protocol=udp                  # VPN Protocol (udp or tcp)\n"
                "           key_file=cli.key              # AES key file\n"
                "           vnd_id=0                      # Virtual network device ID (For SylixOS)\n"
                "           tap_name=tap0                 # Virtual network device name (For Linux & Windows)\n"
@@ -226,11 +229,20 @@ usage:
         mode = kv_cfg_getstring(cfg, "mode", NULL);
         if (!mode) {
             kv_cfg_unload(cfg);
-            fprintf(stderr, "[KidVPN] Can't found mode setting\n");
+            fprintf(stderr, "[KidVPN] Can't find mode setting\n");
             return  (-1);
         }
 
         is_serv = (*mode == 's') ? 1 : 0;
+
+        proto = kv_cfg_getstring(cfg, "protocol", NULL);
+        if (!proto) {
+            kv_cfg_unload(cfg);
+            fprintf(stderr, "[KidVPN] Can't find protocol setting\n");
+            return  (-1);
+        }
+
+        is_tcp = (*proto == 't') ? 1 : 0;
 
         keyfile = kv_cfg_getstring(cfg, "key_file", NULL);
         if (!keyfile) {
@@ -320,17 +332,26 @@ usage:
 
         key_code_xpw(keycode, keybits, argv[3]);
 
-        hole_punching = kv_cfg_getint(cfg, "hole_punching", 0); /* UDP hole punching enable/disable */
-
+        /*
+         * hole punching support for tcp is not tested yet,
+         * so this feature will be temporarily disabled when using tcp,
+         * for compatibility concern.
+         */
+        if (is_tcp) { 
+            hole_punching = 0;
+        } else {
+            hole_punching = kv_cfg_getint(cfg, "hole_punching", 0); /* UDP hole punching enable/disable */
+        }
+        
         kv_cfg_unload(cfg);
 
         daemon(1, 1); /* make server to a daemon mode */
 
         if (is_serv) {
-            return  (kv_serv_start(vnd_id, tapname, keycode, keybits, straddr, port, mtu));
+            return  (kv_serv_start(vnd_id, tapname, keycode, keybits, straddr, port, mtu, is_tcp));
 
         } else {
-            return  (kv_cli_start(vnd_id, tapname, keycode, keybits, straddr, port, mtu, hole_punching));
+            return  (kv_cli_start(vnd_id, tapname, keycode, keybits, straddr, port, mtu, hole_punching, is_tcp));
         }
 
     } else {

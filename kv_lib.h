@@ -109,7 +109,7 @@ extern "C" {
 #define KV_PKY_MAC_BMC(packet)  (packet[0] & 1)  /* broadcast or multicast */
 
 /* KidVPN core lib functions */
-int  kv_lib_init(int vnd_id, const char *tap_name, int *s_fd, int *v_fd, UINT8 hwaddr[], int mtu);
+int  kv_lib_init(int vnd_id, const char *tap_name, int *s_fd, int *v_fd, UINT8 hwaddr[], int mtu, int is_tcp);
 void kv_lib_deinit(int s_fd, int v_fd);
 int  kv_lib_setmtu(int s_fd, int mtu);
 

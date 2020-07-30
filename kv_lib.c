@@ -42,7 +42,7 @@
 static char kv_vnd_ifname[IFNAMSIZ];
 
 /* init vnd device */
-int kv_lib_init (int vnd_id, const char *tap_name, int *s_fd, int *v_fd, UINT8 hwaddr[], int mtu)
+int kv_lib_init (int vnd_id, const char *tap_name, int *s_fd, int *v_fd, UINT8 hwaddr[], int mtu, int is_tcp)
 {
     int i, so_fd = -1, vnd_fd = -1;
     struct ifreq  req;
@@ -50,7 +50,11 @@ int kv_lib_init (int vnd_id, const char *tap_name, int *s_fd, int *v_fd, UINT8 h
     struct ifvnd  vnd;
 #endif /* SYLIXOS */
 
-    so_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (is_tcp) {
+        so_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    } else {
+        so_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    }
     if (so_fd < 0) {
         fprintf(stderr, "[KidVPN] Can not open socket error(%d): %s\n", errno, strerror(errno));
         goto    error;

@@ -45,7 +45,7 @@ extern "C" {
 
 /* KidVPN client start */
 int kv_cli_start(int vnd_id, const char *tap_name, const unsigned char *key, unsigned int keybits,
-                 const char *server, unsigned int port, int mtu, int hole_punching);
+                 const char *server, unsigned int port, int mtu, int hole_punching, int is_tcp);
 
 #ifdef __cplusplus
 }

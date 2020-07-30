@@ -474,7 +474,7 @@ static void kv_cli_hello (void)
 
 /* start KidVPN client */
 int kv_cli_start (int vnd_id, const char *tap_name, const unsigned char *key, unsigned int keybits,
-                  const char *server, unsigned int port, int mtu, int hole_punching)
+                  const char *server, unsigned int port, int mtu, int hole_punching, int is_tcp)
 {
     struct addrinfo hints;
     struct addrinfo *phints;
@@ -544,7 +544,7 @@ int kv_cli_start (int vnd_id, const char *tap_name, const unsigned char *key, un
     }
 
     vnd_mtu = mtu;
-    if (kv_lib_init(vnd_id, tap_name, &cli_fd, &vnd_fd, hello_hdr.hwaddr, mtu)) { /* init client */
+    if (kv_lib_init(vnd_id, tap_name, &cli_fd, &vnd_fd, hello_hdr.hwaddr, mtu, is_tcp)) { /* init client */
         return  (-1);
     }
 
